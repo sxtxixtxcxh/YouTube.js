@@ -10,11 +10,11 @@ function YouTube(params){
   this.orderby    = params.orderby          || 'published'; // 'viewCount', 'published', 'relevance
   this.perpage    = params.perpage          || 10;
   this.page       = params.page             || 1;
-  this.safeSearch = params.saveSearch       || 'moderate'; // 'none', 'moderate', 'strict'
+  this.safeSearch = params.safeSearch       || 'moderate'; // 'none', 'moderate', 'strict'
   this.embed      = {width  : params.width  || 425,
                      height : params.height || 344 };
   
-  YouTube.prototype.request = function(url){
+  this.request = function(url){
       //makes a script object, and executes the script
       //seems to be the only way to get data through youtube's api
       var head = document.getElementsByTagName("head")[0];
@@ -32,9 +32,9 @@ function YouTube(params){
       };
       head.appendChild(script);
       return true;
-  }
+  };
   
-  YouTube.prototype.videoInfo = function(params){
+  this.videoInfo = function(params){
     id          = params.id       || null;
     callback    = params.callback || null;
     //requires a video id and callback
@@ -42,9 +42,9 @@ function YouTube(params){
       return this.request("http://gdata.youtube.com/feeds/api/videos/"+id+"?v=2&alt=json-in-script&callback="+callback);
     else
       return false;
-  }
+  };
   
-  YouTube.prototype.videoFeed = function(params){
+  this.videoFeed = function(params){
     user        = params.user                    || this.user;
     callback    = params.callback                || null;
     orderby     = params.orderby                 || this.orderby;
@@ -56,9 +56,9 @@ function YouTube(params){
       return this.request("http://gdata.youtube.com/feeds/api/videos?v=2&author="+user+"&alt=json-in-script&format=5&orderby="+orderby+"&max-results="+perpage+"&start-index="+start+"&callback="+callback);
     else
       return false;
-  }
+  };
   
-  YouTube.prototype.videoSearch = function(params){
+  this.videoSearch = function(params){
     query       = params.query                   || null;
     callback    = params.callback                || null;
     orderby     = params.orderby                 || this.orderby;
@@ -71,42 +71,42 @@ function YouTube(params){
       return this.request("http://gdata.youtube.com/feeds/api/videos?v=2&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safeSearch+"&max-results="+perpage+"&start-index="+start+"&callback="+callback);
     else
       return false;
-  }
+  };
   
-  YouTube.prototype.processData = function(data){
+  this.processData = function(data){
     var videos = [];
     //build the video array.
     if(data.entry != undefined){
       //single video
-      videos.push( this.parseVideoData( data.entry ) );
+      videos.push( this._parseVideoData( data.entry ) );
     }else if( data.feed != undefined ){
       //video feed
       var total = data.feed.entry.length;
       for (var i=0; i < total; i++) {
-        videos.push( this.parseVideoData( data.feed.entry[i] ) );
+        videos.push( this._parseVideoData( data.feed.entry[i] ) );
       }
     }
     if(videos.length > 0)
       this.data = videos;
     
     return videos;
-  }
+  };
   
-  YouTube.prototype.getVideoId = function(url){
+  this._getVideoId = function(url){
     //strip the video id out of the uri-style id field that we get from the api
     var results = url.match("[\\?&]v=([^&#]*)");
     var id = ( results === null ) ? url : results[1];
     return id;
-  }
+  };
   
-  YouTube.prototype.parseVideoData = function (data) {
+  this._parseVideoData = function (data) {
     //process video data from api into a common data structure for our use
     //this centralizes a single point for filtering the data we get from 
     //google in the event that the objects from them change structure in the future.
     
     var video = {};
     if(data){
-      video.id            = this.getVideoId(data.media$group.media$player.url);
+      video.id            = this._getVideoId(data.media$group.media$player.url);
       video.author        = data.author[0].name.$t;
       video.title         = data.media$group.media$title.$t;
       video.description   = data.media$group.media$description.$t;
@@ -115,15 +115,15 @@ function YouTube(params){
       video.url           = data.media$group.media$player.url;
       video.published     = data.published.$t;
       video.updated       = data.updated.$t;
-      video.duration      = this.parseVideoDuration(data.media$group.yt$duration.seconds);
-      video.thumbnails    = this.sortThumbnails(data.media$group.media$thumbnail);
+      video.duration      = this._parseVideoDuration(data.media$group.yt$duration.seconds);
+      video.thumbnails    = this._sortThumbnails(data.media$group.media$thumbnail);
     }
     
     if( video.id === undefined ) video = false;
     return video;
-  }
+  };
   
-  YouTube.prototype.sortThumbnails = function(thumbnails){
+  this._sortThumbnails = function(thumbnails){
     //sort thumbnails by url/filename.
     //default.jpg, hqdefault, then by filename(chronologically)
     
@@ -154,22 +154,22 @@ function YouTube(params){
     };
     
     return defaults_then_numeric;
-  }
+  };
   
-  YouTube.prototype.parseVideoDuration = function (seconds){
+  this._parseVideoDuration = function (seconds){
     min = Math.floor(seconds/60);
     sec = seconds % 60;
     return min+":"+sec;
-  }
+  };
   
-  YouTube.prototype.embedCode = function(params){
+  this.embedCode = function(params){
     //configuration of flash video object
     var flash_params = {
       id      : params.id,
       width   : params.width || this.embed.width,
       height  : params.width || this.embed.height,
       url     : 'http://www.youtube.com/v/'+params.id+'&rel=0&hl=en&fs=1&'  
-    }
+    };
     
     var embedCode ='<object width="'+flash_params.width+'" height="'+flash_params.height+'" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">'
       +'<param name="movie" value="'+flash_params.url+'"></param>'
@@ -178,5 +178,5 @@ function YouTube(params){
       +'<embed src="'+flash_params.url+'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+flash_params.width+'" height="'+flash_params.height+'"></embed>'
       +'</object>';
     return embedCode;
-  }
+  };
 };
