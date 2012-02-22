@@ -76,6 +76,12 @@
           <form class="" action="" id="searchForm" method="get" accept-charset="utf-8">
             <label for="youtube_query">Search: </label>
             <input type="text" name="youtube_query" value="" id="youtube_query">
+            <select id="searchSort">
+              <option value="relevance" select="selected">Relevance</option>
+              <option value="viewCount">View Count</option>
+              <option value="rating">Rating</option>
+              <option value="published">Upload Date</option>
+            </select>
             <p><input class="btn" type="submit" value="Get Videos."></p>
           </form>
           </div>
@@ -139,13 +145,19 @@
 
     searchForm.onsubmit = function(){
       var query = document.getElementById('youtube_query').value;
+      var searchSort = document.getElementById('searchSort').value;
       if(query){
         youtube.videoSearch({
-          query: query
+          query: query,
+          orderby: searchSort
         }, replaceVideos);
         document.getElementById('youtube_query').blur();
       }
       return false;
+    };
+    
+    document.getElementById('searchSort').onchange = function(){
+      searchForm.onsubmit();
     };
 
   </script>

@@ -8,7 +8,7 @@ function YouTube(params){
   params          = params || {};
   this.apiVersion = params.apiVersion       || 2;
   this.user       = params.user             || null;
-  this.orderby    = params.orderby          || 'published'; // 'viewCount', 'published', 'relevance
+  this.orderby    = params.orderby          || 'published'; // 'rating', 'viewCount', 'published', 'relevance
   this.perpage    = params.perpage          || 10;
   this.page       = params.page             || 1;
   this.safeSearch = params.safeSearch       || 'moderate'; // 'none', 'moderate', 'strict'
