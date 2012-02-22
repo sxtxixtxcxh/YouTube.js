@@ -99,6 +99,7 @@
 
 
   <script>
+  $(function(){
     var youtube = new YouTube();
     
     var userForm = document.getElementById('usernameForm');
@@ -121,6 +122,7 @@
       });
 
       document.getElementById('videoContainer').innerHTML = embeds;
+      
       $('#videoContainer .videoThumb').click(function(){
         var videoId = $(this)[0].id;
         var $container = $(this).parent();
@@ -130,8 +132,7 @@
     };
     
 
-
-    usernameForm.onsubmit = function(){
+    $(userForm).submit(function(){
       var username = document.getElementById('youtube_username').value;
       if(username){
         youtube.videoFeed({
@@ -140,10 +141,10 @@
         document.getElementById('youtube_username').blur();
       }
       return false;
-    };
+    });
 
 
-    searchForm.onsubmit = function(){
+    $(searchForm).submit(function(){
       var query = document.getElementById('youtube_query').value;
       var searchSort = document.getElementById('searchSort').value;
       if(query){
@@ -154,12 +155,12 @@
         document.getElementById('youtube_query').blur();
       }
       return false;
-    };
+    });
     
     document.getElementById('searchSort').onchange = function(){
-      searchForm.onsubmit();
+      $(searchForm).submit();
     };
-
+  });
   </script>
 </body>
 </html>
