@@ -6,74 +6,65 @@
 
 function YouTube(params){
   params          = params || {};
+  this.apiVersion = params.apiVersion       || 2;
   this.user       = params.user             || null;
   this.orderby    = params.orderby          || 'published'; // 'viewCount', 'published', 'relevance
   this.perpage    = params.perpage          || 10;
   this.page       = params.page             || 1;
   this.safeSearch = params.safeSearch       || 'moderate'; // 'none', 'moderate', 'strict'
-  this.embed      = {width  : params.width  || 425,
+  this.embed      = { width : params.width  || 425,
                      height : params.height || 344 };
-  
-  this.request = function(url){
-      //makes a script object, and executes the script
-      //seems to be the only way to get data through youtube's api
-      var head = document.getElementsByTagName("head")[0];
-      var script = document.createElement("script");
-      script.src = url;
 
-      // Handle Script loading
-      var done = false;
-
-      // Attach handlers for all browsers
-      script.onload = function(){
-        // Handle memory leak in IE
-        script.onload =  null;
-        head.removeChild( script );
-      };
-      head.appendChild(script);
-      return true;
-  };
-  
-  this.videoInfo = function(params){
-    id          = params.id       || null;
-    callback    = params.callback || null;
+  this.videoInfo = function(id, callback){
+    var id          = id       || null;
+    var callback    = callback || function(){};
     //requires a video id and callback
     if(id != null && callback != null)
-      return this.request("http://gdata.youtube.com/feeds/api/videos/"+id+"?v=2&alt=json-in-script&callback="+callback);
+      return this._request("http://gdata.youtube.com/feeds/api/videos/"+id+"?v="+this.apiVersion+"&alt=json-in-script", callback);
     else
       return false;
   };
   
-  this.videoFeed = function(params){
-    user        = params.user                    || this.user;
-    callback    = params.callback                || null;
-    orderby     = params.orderby                 || this.orderby;
-    perpage     = params.perpage                 || this.perpage;
-    start       = (params.page*perpage)/perpage  || this.page;
+  this.forEach = function(obj, iterator, context){
+    for (var i = obj.length - 1; i >= 0; i--){
+      iterator.call(context, obj[i], i, obj);
+    };
+  };
+  
+  this.videoFeed = function(params, callback){
+    var params      = params || {};
+    var callback    = callback || function(){};
+    var user        = params.user                    || this.user;
+    var orderby     = params.orderby                 || this.orderby;
+    var perpage     = params.perpage                 || this.perpage;
+    var start       = (params.page*perpage)/perpage  || this.page;
     
     //requires a user's username and callback
-    if(user != null && callback != null)
-      return this.request("http://gdata.youtube.com/feeds/api/videos?v=2&author="+user+"&alt=json-in-script&format=5&orderby="+orderby+"&max-results="+perpage+"&start-index="+start+"&callback="+callback);
-    else
+    if(user != null && callback != null){
+      return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&author="+user+"&alt=json-in-script&format=5&orderby="+orderby+"&max-results="+perpage+"&start-index="+start, callback);
+    }else{
       return false;
+    }
   };
   
-  this.videoSearch = function(params){
-    query       = params.query                   || null;
-    callback    = params.callback                || null;
-    orderby     = params.orderby                 || this.orderby;
-    perpage     = params.perpage                 || this.perpage;
-    start       = (params.page*perpage)/perpage  || this.page;
-    safeSearch  = params.safeSearch              || this.safeSearch;
+  this.videoSearch = function(params, callback){
+    var params      = params    || {};
+    var callback    = callback  || function(){};
+
+    var query       = params.query                   || null;
+    var orderby     = params.orderby                 || this.orderby;
+    var perpage     = params.perpage                 || this.perpage;
+    var start       = (params.page*perpage)/perpage  || this.page;
+    var safeSearch  = params.safeSearch              || this.safeSearch;
     
     //requires a query and callback
     if(query != null && callback != null)
-      return this.request("http://gdata.youtube.com/feeds/api/videos?v=2&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safeSearch+"&max-results="+perpage+"&start-index="+start+"&callback="+callback);
+      return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safeSearch+"&max-results="+perpage+"&start-index="+start, callback);
     else
       return false;
   };
   
-  this.processData = function(data){
+  this._processData = function(data){
     var videos = [];
     //build the video array.
     if(data.entry != undefined){
@@ -86,12 +77,52 @@ function YouTube(params){
         videos.push( this._parseVideoData( data.feed.entry[i] ) );
       }
     }
-    if(videos.length > 0)
-      this.data = videos;
     
     return videos;
   };
   
+  this._request = function(url, callback){
+    var params = params || {};
+    var jsc = new Date().getTime();
+    // Build temporary JSONP function
+    var jsonp = "jsonp"+ jsc++;
+    
+    var url = url+ '&callback='+jsonp;
+
+    // Handle JSONP-style loading
+    var obj_callback_context = this;
+    window[ jsonp ] = window[ jsonp ] || function( data ) {
+      
+      var videos = obj_callback_context._processData(data);
+      callback(videos);
+      
+      // Garbage collect
+      window[ jsonp ] = undefined;
+
+      try {
+        delete window[ jsonp ];
+      } catch(e) { }
+
+      if ( head ) {
+        head.removeChild( script );
+      }
+
+    };
+
+    // If we're requesting a remote document
+    // and trying to load JSON or Script with a GET
+    var head = document.getElementsByTagName("head")[0] || document.documentElement;
+    var script = document.createElement("script");
+    script.src = url;
+
+    // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+    head.insertBefore( script, head.firstChild );
+
+    // We handle everything using the script element injection
+    return undefined;
+
+  };
+
   this._getVideoId = function(url){
     //strip the video id out of the uri-style id field that we get from the api
     var results = url.match("[\\?&]v=([^&#]*)");
@@ -162,20 +193,22 @@ function YouTube(params){
     return min+":"+sec;
   };
   
-  this.embedCode = function(params){
+  this.embedCode = function(videoObjOrID, flashParams){
+    var video = ('string' === typeof videoObjOrID) ? {id: videoObjOrID} : videoObjOrID;
     //configuration of flash video object
-    var flash_params = {
-      id      : params.id,
-      width   : params.width || this.embed.width,
-      height  : params.width || this.embed.height,
-      url     : 'http://www.youtube.com/v/'+params.id+'&rel=0&hl=en&fs=1&'  
+    var flashParams = flashParams || {};
+    var flashParams = {
+      id      : video.id,
+      width   : flashParams.width || this.embed.width,
+      height  : flashParams.width || this.embed.height,
+      url     : 'http://www.youtube.com/v/'+video.id+'&rel=0&hl=en&fs=1&'
     };
     
-    var embedCode ='<object width="'+flash_params.width+'" height="'+flash_params.height+'" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">'
-      +'<param name="movie" value="'+flash_params.url+'"></param>'
+    var embedCode ='<object width="'+flashParams.width+'" height="'+flashParams.height+'" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">'
+      +'<param name="movie" value="'+flashParams.url+'"></param>'
       +'<param name="allowFullScreen" value="true"></param>'
       +'<param name="allowscriptaccess" value="always"></param>'
-      +'<embed src="'+flash_params.url+'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+flash_params.width+'" height="'+flash_params.height+'"></embed>'
+      +'<embed src="'+flashParams.url+'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+flashParams.width+'" height="'+flashParams.height+'"></embed>'
       +'</object>';
     return embedCode;
   };
