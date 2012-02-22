@@ -1,7 +1,106 @@
 <html>
 <head>
   <title>YouTube.js Demo</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="screen" charset="utf-8">
   <script src="javascripts/youtube.js"></script>
+  <style>
+    body{
+      padding-top: 60px;
+    }
+  </style>
 </head>
-<body></body>
+<body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="#">Project name</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="row">
+      <div class="span3">
+        
+        <div class="row">
+          <div class="span3">
+          <form class="" action="" id="usernameForm" method="get" accept-charset="utf-8">
+            <label for="youtube_username">Youtube Username: </label>
+            <input type="text" class="span3" name="youtube_username" value="" id="youtube_username">
+            <p><input class="btn" type="submit" value="Get Videos."></p>
+          </form>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="span3">
+          <form class="" action="" id="searchForm" method="get" accept-charset="utf-8">
+            <label for="youtube_query">Search: </label>
+            <input type="text" name="youtube_query" value="" id="youtube_query">
+            <p><input class="btn" type="submit" value="Get Videos."></p>
+          </form>
+          </div>
+        </div>
+        
+      </div>
+      <div class="span9">
+        <div id="videoContainer" class="row"></div>
+      </div>
+    </div>
+    
+  </div>
+  
+
+
+
+  <script>
+    var youtube = new YouTube();
+    
+    var userForm = document.getElementById('usernameForm');
+    var searchForm = document.getElementById('searchForm');
+
+    function replaceVideos(videos){
+      var embeds = '';
+      youtube.forEach(videos, function(video){
+        embeds += '<div class="row"><div class="span6">'+youtube.embedCode(video)+'</div></div>';
+      });
+
+      document.getElementById('videoContainer').innerHTML = embeds;
+    };
+
+    usernameForm.onsubmit = function(){
+      var username = document.getElementById('youtube_username').value;
+      if(username){
+        youtube.videoFeed({
+          user: username
+        }, replaceVideos);
+      }
+      return false;
+    };
+
+
+    searchForm.onsubmit = function(){
+      var query = document.getElementById('youtube_query').value;
+      if(query){
+        youtube.videoSearch({
+          query: query
+        }, replaceVideos);
+      }
+      return false;
+    };
+
+  </script>
+</body>
 </html>
