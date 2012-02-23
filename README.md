@@ -10,12 +10,12 @@ Create a YouTube object, passing in params.
 
 Call a method, passing it a function name as a callback param. 
 
-    var youtube = new YouTube({
-      user:'sxtxixtxcxh'
-    });
+    var youtube = new YouTube();
 
     youtube.videoFeed({
-      callback : 'console.log'
+      user : 'sxtxixtxcxh'
+    }, function(videos){
+      // do whatever with the results.
     });
     
 I'll be honest, I haven't looked at this code in almost a year, and I've nearly forgotten how to use it.
