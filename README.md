@@ -27,14 +27,14 @@ Public methods:
 
 - `videoInfo( videoId (string), callback (function) )`
 - `videoFeed( params (object), callback (function) )`
-
+  
   valid params:
   - `user` (string, required) - a youtube username 
   - `orderby` (string) - can be `published` (default), `rating`, or `viewCount`
   - `perpage` (int) - videos to return per page (default: 10)
   - `start` (int) - page number to start on (default: 10)  
 - `videoSearch( params (object), callback (function) )`  
-
+  
   valid params:
   - `query` (string, required) - a search term 
   - `orderby` (string) - can be `relevance` (default), `published`, `rating`, or `viewCount`
@@ -46,7 +46,7 @@ Helper methods:
 ---------------
 - `forEach( object, function, context)`
 - `embedCode( video (string or video object), flashParams (object) )`
-
+  
   valid flash params:
   - `width` - int (default: 425)
   - `height` - int (default: 344)
