@@ -4,7 +4,7 @@
 //
 //////////////////////////
 
-function YouTube(params){
+function YouTubeJS(params){
   params          = params || {};
   this.apiVersion = params.apiVersion       || 2;
   this.user       = params.user             || null;
@@ -23,12 +23,6 @@ function YouTube(params){
       return this._request("http://gdata.youtube.com/feeds/api/videos/"+id+"?v="+this.apiVersion+"&alt=json-in-script", callback);
     else
       return false;
-  };
-  
-  this.forEach = function(obj, iterator, context){
-    for (var i = obj.length - 1; i >= 0; i--){
-      iterator.call(context, obj[i], i, obj);
-    };
   };
   
   this.videoFeed = function(params, callback){
@@ -64,6 +58,34 @@ function YouTube(params){
       return false;
   };
   
+  // Helpers
+  this.forEach = function(obj, iterator, context){
+    for (var i = obj.length - 1; i >= 0; i--){
+      iterator.call(context, obj[i], i, obj);
+    };
+  };
+  
+  this.embedCode = function(videoObjOrID, flashParams){
+    var video = ('string' === typeof videoObjOrID) ? {id: videoObjOrID} : videoObjOrID;
+    //configuration of flash video object
+    var flashParams = flashParams || {};
+    var flashParams = {
+      id      : video.id,
+      width   : flashParams.width || this.embed.width,
+      height  : flashParams.width || this.embed.height,
+      url     : 'http://www.youtube.com/v/'+video.id+'&rel=0&hl=en&fs=1&'
+    };
+    
+    var embedCode ='<object width="'+flashParams.width+'" height="'+flashParams.height+'" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">'
+      +'<param name="movie" value="'+flashParams.url+'"></param>'
+      +'<param name="allowFullScreen" value="true"></param>'
+      +'<param name="allowscriptaccess" value="always"></param>'
+      +'<embed src="'+flashParams.url+'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+flashParams.width+'" height="'+flashParams.height+'"></embed>'
+      +'</object>';
+    return embedCode;
+  };
+
+  // private methods
   this._processData = function(data){
     var videos = [];
     //build the video array.
@@ -193,23 +215,4 @@ function YouTube(params){
     return min+":"+sec;
   };
   
-  this.embedCode = function(videoObjOrID, flashParams){
-    var video = ('string' === typeof videoObjOrID) ? {id: videoObjOrID} : videoObjOrID;
-    //configuration of flash video object
-    var flashParams = flashParams || {};
-    var flashParams = {
-      id      : video.id,
-      width   : flashParams.width || this.embed.width,
-      height  : flashParams.width || this.embed.height,
-      url     : 'http://www.youtube.com/v/'+video.id+'&rel=0&hl=en&fs=1&'
-    };
-    
-    var embedCode ='<object width="'+flashParams.width+'" height="'+flashParams.height+'" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">'
-      +'<param name="movie" value="'+flashParams.url+'"></param>'
-      +'<param name="allowFullScreen" value="true"></param>'
-      +'<param name="allowscriptaccess" value="always"></param>'
-      +'<embed src="'+flashParams.url+'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="'+flashParams.width+'" height="'+flashParams.height+'"></embed>'
-      +'</object>';
-    return embedCode;
-  };
 };
