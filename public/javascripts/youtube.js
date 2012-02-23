@@ -11,7 +11,7 @@ function YouTube(params){
   this.orderby    = params.orderby          || 'published'; // 'rating', 'viewCount', 'published', 'relevance
   this.perpage    = params.perpage          || 10;
   this.page       = params.page             || 1;
-  this.safeSearch = params.safeSearch       || 'moderate'; // 'none', 'moderate', 'strict'
+  this.safesearch = params.safesearch       || 'moderate'; // 'none', 'moderate', 'strict'
   this.embed      = { width : params.width  || 425,
                      height : params.height || 344 };
 
@@ -55,11 +55,11 @@ function YouTube(params){
     var orderby     = params.orderby                 || this.orderby;
     var perpage     = params.perpage                 || this.perpage;
     var start       = (params.page*perpage)/perpage  || this.page;
-    var safeSearch  = params.safeSearch              || this.safeSearch;
+    var safesearch  = params.safesearch              || this.safesearch;
     
     //requires a query and callback
     if(query != null && callback != null)
-      return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safeSearch+"&max-results="+perpage+"&start-index="+start, callback);
+      return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safesearch+"&max-results="+perpage+"&start-index="+start, callback);
     else
       return false;
   };
