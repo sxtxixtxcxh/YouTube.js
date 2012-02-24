@@ -1,4 +1,4 @@
-var youtube = new YouTube();
+var youtube = new YouTubeJS();
 
 $(function(){
   
