@@ -1,0 +1,38 @@
+--- 
+title: Home
+---
+
+<div class="row">
+  <div class="span3">
+    
+    <div class="row">
+      <div class="span3">
+      <form class="" action="" id="usernameForm" method="get" accept-charset="utf-8">
+        <label for="youtube_username">Youtube Username: </label>
+        <input type="text" class="span3" name="youtube_username" value="" id="youtube_username">
+        <p><input class="btn" type="submit" value="Get Videos."></p>
+      </form>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="span3">
+      <form class="" action="" id="searchForm" method="get" accept-charset="utf-8">
+        <label for="youtube_query">Search: </label>
+        <input type="text" name="youtube_query" value="" id="youtube_query">
+        <select id="searchSort">
+          <option value="relevance" select="selected">Relevance</option>
+          <option value="viewCount">View Count</option>
+          <option value="rating">Rating</option>
+          <option value="published">Upload Date</option>
+        </select>
+        <p><input class="btn" type="submit" value="Get Videos."></p>
+      </form>
+      </div>
+    </div>
+    
+  </div>
+  <div class="span9">
+    <div id="videoContainer" class="row"></div>
+  </div>
+</div>

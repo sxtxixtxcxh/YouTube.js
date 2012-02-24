@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>YouTube.js</title>
+  <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/stylesheets/screen.css" type="text/css" media="screen" charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
+  <script src="/javascripts/youtube.js"></script>
+  <script src="/javascripts/application.js"></script>
+</head>
+<body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="/">YouTube.js</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="<%=  'current' if item.path == '/' %>"><a href="/">Home</a></li>
+            <li class="<%=  'current' if item.path == '/readme/' %>"><a href="/readme">Readme</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <%= yield %>
+  </div>
+
+</body>
+</html>
