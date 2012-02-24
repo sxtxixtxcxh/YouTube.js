@@ -4,7 +4,7 @@
 //
 //////////////////////////
 
-function YouTubeJS(params){
+function YouTubeJS(params) {
   params          = params || {};
   this.apiVersion = params.apiVersion       || 2;
   this.user       = params.user             || null;
@@ -15,35 +15,35 @@ function YouTubeJS(params){
   this.embed      = { width : params.width  || 425,
                      height : params.height || 344 };
 
-  this.videoInfo = function(id, callback){
-    var id          = id       || null;
+  this.videoInfo = function (id, callback) {
     var callback    = callback || function(){};
     //requires a video id and callback
-    if(id != null && callback != null)
+    if (id !== null && callback !== null) {
       return this._request("http://gdata.youtube.com/feeds/api/videos/"+id+"?v="+this.apiVersion+"&alt=json-in-script", callback);
-    else
+    } else{
       return false;
+    }
   };
   
-  this.videoFeed = function(params, callback){
+  this.videoFeed = function (params, callback) {
     var params      = params || {};
-    var callback    = callback || function(){};
+    var callback    = callback || function () {};
     var user        = params.user                    || this.user;
     var orderby     = params.orderby                 || this.orderby;
     var perpage     = params.perpage                 || this.perpage;
     var start       = (params.page*perpage)/perpage  || this.page;
     
     //requires a user's username and callback
-    if(user != null && callback != null){
+    if (user !== null && callback !== null) {
       return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&author="+user+"&alt=json-in-script&format=5&orderby="+orderby+"&max-results="+perpage+"&start-index="+start, callback);
-    }else{
+    } else {
       return false;
     }
   };
   
-  this.videoSearch = function(params, callback){
+  this.videoSearch = function (params, callback) {
     var params      = params    || {};
-    var callback    = callback  || function(){};
+    var callback    = callback  || function () {};
 
     var query       = params.query                   || null;
     var orderby     = params.orderby                 || this.orderby;
@@ -52,20 +52,21 @@ function YouTubeJS(params){
     var safesearch  = params.safesearch              || this.safesearch;
     
     //requires a query and callback
-    if(query != null && callback != null)
+    if (query !== null && callback !== null) {
       return this._request("http://gdata.youtube.com/feeds/api/videos?v="+this.apiVersion+"&q="+escape(query)+"&alt=json-in-script&format=5&orderby="+orderby+"&safeSearch="+safesearch+"&max-results="+perpage+"&start-index="+start, callback);
-    else
+    } else {
       return false;
+    }
   };
   
   // Helpers
-  this.forEach = function(obj, iterator, context){
+  this.forEach = function (obj, iterator, context) {
     for (var i = obj.length - 1; i >= 0; i--){
       iterator.call(context, obj[i], i, obj);
     };
   };
   
-  this.embedCode = function(videoObjOrID, flashParams){
+  this.embedCode = function (videoObjOrID, flashParams) {
     var video = ('string' === typeof videoObjOrID) ? {id: videoObjOrID} : videoObjOrID;
     //configuration of flash video object
     var flashParams = flashParams || {};
@@ -86,7 +87,7 @@ function YouTubeJS(params){
   };
 
   // private methods
-  this._processData = function(data){
+  this._processData = function (data) {
     var videos = [];
     //build the video array.
     if(data.entry != undefined){
@@ -103,7 +104,7 @@ function YouTubeJS(params){
     return videos;
   };
   
-  this._request = function(url, callback){
+  this._request = function (url, callback) {
     var params = params || {};
     var jsc = new Date().getTime();
     // Build temporary JSONP function
@@ -145,7 +146,7 @@ function YouTubeJS(params){
 
   };
 
-  this._getVideoId = function(url){
+  this._getVideoId = function (url) {
     //strip the video id out of the uri-style id field that we get from the api
     var results = url.match("[\\?&]v=([^&#]*)");
     var id = ( results === null ) ? url : results[1];
@@ -176,7 +177,9 @@ function YouTubeJS(params){
     return video;
   };
   
-  this._sortThumbnails = function(thumbnails){
+  this._sortThumbnails = function (thumbnails) {
+    var defaults_then_numeric = [];
+    
     //sort thumbnails by url/filename.
     //default.jpg, hqdefault, then by filename(chronologically)
     
@@ -189,12 +192,11 @@ function YouTubeJS(params){
                           
 
     //... then set the default jpg to 0, and hq default to 1...
-    defaults_then_numeric = [];
     for (var i=0; i < sorted.length; i++) {
-      if(sorted[i].url.indexOf('/default.jpg')> 1){
+      if (sorted[i].url.indexOf('/default.jpg')> 1) {
         defaults_then_numeric[0] = sorted[i];
         delete sorted[i];
-      }else if(sorted[i].url.indexOf('/hqdefault.jpg')> 1){
+      } else if(sorted[i].url.indexOf('/hqdefault.jpg')> 1) {
         defaults_then_numeric[1] = sorted[i];
         delete sorted[i];
       };
@@ -202,14 +204,14 @@ function YouTubeJS(params){
     
     // ... then push everything else.
     for (var i=0; i < sorted.length; i++) {
-      if(sorted[i] != undefined)
+      if (sorted[i] !== undefined)
         defaults_then_numeric.push(sorted[i]);
     };
     
     return defaults_then_numeric;
   };
   
-  this._parseVideoDuration = function (seconds){
+  this._parseVideoDuration = function (seconds) {
     min = Math.floor(seconds/60);
     sec = seconds % 60;
     return min+":"+sec;
