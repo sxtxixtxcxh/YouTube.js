@@ -114,10 +114,10 @@ function YouTubeJS(params) {
 
     // Handle JSONP-style loading
     var obj_callback_context = this;
-    window[ jsonp ] = window[ jsonp ] || function( data ) {
+    window[ jsonp ] = window[ jsonp ] || function( response ) {
       
-      var videos = obj_callback_context._processData(data);
-      callback(videos);
+      var data = obj_callback_context._processData(response);
+      callback(data);
       
       // Garbage collect
       window[ jsonp ] = undefined;
