@@ -3,6 +3,8 @@ YouTube.js
 
 A simple JS class for working with YouTube's json API.
 
+Demo: http://youtubejs.prototypeapp.com/
+
 Usage:
 ------
 
